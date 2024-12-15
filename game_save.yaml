@@ -1,0 +1,18 @@
+---
+:secret_word: chapter
+:guessed_letters:
+- a
+- e
+- p
+- c
+- h
+- a
+- p
+- t
+- e
+- r
+:wrong_guesses:
+- s
+- m
+- o
+:max_attempts: 6
