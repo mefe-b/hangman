@@ -7,7 +7,7 @@ class Hangman
     @secret_word = ""
     @guessed_letters = []
     @wrong_guesses = []
-    @hangman_parts = ["", " ", " ", " ", " ", " "]
+    @hangman_parts = ["", " O ", "/|\\", "/ \\"]
   end
 
   def load_word_list
@@ -25,13 +25,8 @@ class Hangman
   end
 
   def display_hangman
-    puts "------"
-    puts @hangman_parts[0]
-    puts @hangman_parts[1]
-    puts @hangman_parts[2]
-    puts @hangman_parts[3]
-    puts @hangman_parts[4]
-    puts @hangman_parts[5]
+    puts "\n------"
+    @wrong_guesses.size.times { |i| puts @hangman_parts[i] }
     puts "------"
   end
 
@@ -45,17 +40,27 @@ class Hangman
   end
 
   def guess_the_letter
-    print "\nEnter a letter: "
-    letter = gets.chomp.downcase
+    print "\nEnter a letter or the full word: "
+    input = gets.chomp.downcase
 
-    if letter.length != 1 || !letter.match?(/[a-z]/)
-      puts "Invalid input. Please enter a single letter."
-      return false
+    if input.length == 1
+      process_single_letter(input)
+    elsif input.length == @secret_word.length
+      process_full_word(input)
+    else
+      puts "Invalid input. Enter a single letter or guess the full word."
+    end
+  end
+
+  def process_single_letter(letter)
+    if !letter.match?(/[a-z]/)
+      puts "Invalid input. Please enter a valid letter."
+      return
     end
 
     if @guessed_letters.include?(letter) || @wrong_guesses.include?(letter)
       puts "You already guessed '#{letter}'. Try a different letter."
-      return false
+      return
     end
 
     if @secret_word.include?(letter)
@@ -63,17 +68,18 @@ class Hangman
       puts "Good job! '#{letter}' is correct!"
     else
       @wrong_guesses << letter
-      @hangman_parts[@wrong_guesses.size - 1] = case @wrong_guesses.size
-                                                when 1 then "  O  "
-                                                when 2 then " /|  "
-                                                when 3 then " /|\\ "
-                                                when 4 then " /    "
-                                                when 5 then " / \\ "
-                                                end
       puts "Sorry! '#{letter}' is incorrect."
     end
+  end
 
-    true
+  def process_full_word(word)
+    if word == @secret_word
+      @guessed_letters += @secret_word.chars
+      puts "Amazing! You guessed the entire word!"
+    else
+      @wrong_guesses << word
+      puts "Sorry, '#{word}' is not correct."
+    end
   end
 
   def is_winner?
@@ -120,7 +126,7 @@ class Hangman
 
   def start_game
     puts "Welcome to Hangman!"
-    puts "Rules: Guess the secret word one letter at a time. You have #{@max_attempts} attempts."
+    puts "Rules: Guess the secret word one letter at a time or try the full word. You have #{@max_attempts} attempts."
 
     print "Do you want to load a saved game? (yes/no): "
     response = gets.chomp.downcase
